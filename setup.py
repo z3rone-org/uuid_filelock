@@ -2,7 +2,6 @@ from setuptools import setup, find_packages
 
 setup(
     name="uuid-filelock",
-    version="1.0.0",
     description="A simple UUID-based file lock implementation for Python.",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
@@ -17,7 +16,8 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "somepackage>=1.0.0",
+        "setuptools",
+        "setuptools-csm",
     ],
     extras_require={
         "dev": [
