@@ -22,7 +22,7 @@ setup(
     ],
     extras_require={
         "dev": [
-            "pytest>=6.0",
+            "pytest",
         ]
     },
     setup_requires=['setuptools_scm'],
