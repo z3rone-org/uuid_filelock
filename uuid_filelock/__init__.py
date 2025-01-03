@@ -28,8 +28,11 @@ class UUIDFileLock:
 
                 # Wait a moment and verify the lock
                 time.sleep(self.retry_interval)
-                with open(self.lock_file, 'r') as f:
-                    lock_content = f.read().strip()
+                try:
+                    with open(self.lock_file, 'r') as f:
+                        lock_content = f.read().strip()
+                except:
+                    lock_content = None
 
                 if lock_content == self.my_uuid:
                     # Successfully acquired the lock
