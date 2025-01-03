@@ -1,82 +1,66 @@
 import pytest
 import uuid
 import os
-from uuid_filelock import UUIDFileLock
+from uuid_filelock import UUIDFileLock, LockTimeoutException
 
 
-@pytest.fixture
-def lock_file(tmpdir):
-    # Create a temporary lock file
-    return tmpdir.join("test_lock_file")
+def test_two_locks(tmpdir):
+    lockfile = os.path.join(tmpdir, '.lock')
+    lock1 = UUIDFileLock(lockfile)
+    lock2 = UUIDFileLock(lockfile)
 
-
-@pytest.fixture
-def mock_uuid():
-    # Return a mocked UUID
-    return str(uuid.uuid4())
-
-
-def test_acquire_lock(lock_file, mock_uuid):
-    lock = UUIDFileLock(str(lock_file))
-    lock.my_uuid = mock_uuid  # Use the mocked UUID
+    assert not lock1.check_lock()
+    assert not lock2.check_lock()
 
     # Acquire the lock
-    lock.acquire()
+    lock1.acquire()
 
-    # Check if the lock file was created with the correct UUID
-    with open(str(lock_file), 'r') as f:
-        lock_content = f.read().strip()
+    assert lock1.check_lock()
+    assert not lock2.check_lock()
 
-    assert lock_content == mock_uuid
+    lock1.release()
+    lock2.acquire()
 
+    assert not lock1.check_lock()
+    assert lock2.check_lock()
 
-def test_release_lock(lock_file, mock_uuid):
-    # Simulate the lock file existing with the correct UUID
-    lock = UUIDFileLock(str(lock_file))
-    lock.my_uuid = mock_uuid  # Use the mocked UUID
+    lock2.release()
 
-    # Create the file to simulate the lock being held
-    with open(str(lock_file), 'w') as f:
-        f.write(mock_uuid)
-
-    # Release the lock
-    lock.release()
-
-    # Check if the lock file is removed
-    assert not os.path.exists(str(lock_file))
+    assert not lock1.check_lock()
+    assert not lock2.check_lock()
 
 
-def test_release_lock_when_locked_by_another(lock_file, mock_uuid):
-    # Simulate a lock file with a different UUID
-    other_uuid = str(uuid.uuid4())
-    lock = UUIDFileLock(str(lock_file))
-    lock.my_uuid = mock_uuid  # Use the mocked UUID
+def test_timeout(tmpdir):
+    lockfile = os.path.join(tmpdir, '.lock')
+    lock1 = UUIDFileLock(lockfile)
+    lock2 = UUIDFileLock(lockfile, timeout_interval=3)
 
-    # Create the file with a different UUID
-    with open(str(lock_file), 'w') as f:
-        f.write(other_uuid)
+    lock1.acquire()
+    assert lock1.check_lock()
 
-    # Release the lock (should not remove the lock file as the UUID is different)
-    lock.release()
+    try:
+        lock2.acquire()
+        assert False
+    except LockTimeoutException:
+        assert not lock2.check_lock()
 
-    # Ensure that the lock file still exists
-    with open(str(lock_file), 'r') as f:
-        lock_content = f.read().strip()
-
-    assert lock_content == other_uuid
+    lock1.release()
+    assert not lock1.check_lock()
+    assert not lock2.check_lock()
 
 
-def test_context_manager(lock_file, mock_uuid):
-    lock = UUIDFileLock(str(lock_file))
-    lock.my_uuid = mock_uuid  # Use the mocked UUID
+
+def test_context_manager(tmpdir):
+    lockfile = os.path.join(tmpdir, '.lock')
+    lock = UUIDFileLock(str(lockfile))
 
     # Use the context manager to acquire and release the lock
     with lock:
         # Check that the lock file was created with the correct UUID
-        with open(str(lock_file), 'r') as f:
+        with open(str(lockfile), 'r') as f:
             lock_content = f.read().strip()
 
-        assert lock_content == mock_uuid
+        assert lock_content == lock.my_uuid
 
     # Ensure that the lock file is removed after exiting the context
-    assert not os.path.exists(str(lock_file))
+    assert not os.path.exists(str(lockfile))

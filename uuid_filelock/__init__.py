@@ -1,10 +1,15 @@
 import os
 import time
 import uuid
-from typing import Optional
+from datetime import datetime
+
 
 class UUIDFileLock:
-    def __init__(self, lock_file: str, verification_delay: float = 1.0, retry_interval: float = 0.5):
+    def __init__(self,
+                 lock_file: str,
+                 verification_delay: float = 1.0,
+                 retry_interval: float = 0.5,
+                 timeout_interval: float = -1):
         """
         Initialize the UUIDFileLock.
 
@@ -17,11 +22,14 @@ class UUIDFileLock:
         self.verification_delay = verification_delay
         self.retry_interval = retry_interval
         self.my_uuid = str(uuid.uuid4())
+        self.timeout_interval = timeout_interval
 
     def acquire(self):
         """
         Acquire the lock by following the UUID-based file lock mechanism.
         """
+        start_time = datetime.now()
+
         while True:
             if not os.path.exists(self.lock_file):
                 # Attempt to create the lock file with the UUID
@@ -41,8 +49,27 @@ class UUIDFileLock:
                     # Successfully acquired the lock
                     return
 
+            if self.timeout_interval >= 0.0:
+                if (datetime.now() - start_time).total_seconds() > self.timeout_interval:
+                    raise LockTimeoutException()
+
             # If the lock file exists or the content mismatches, retry
             time.sleep(self.retry_interval)
+
+    def check_lock(self):
+        try:
+            with open(self.lock_file, 'r') as f:
+                lock_content = f.read().strip()
+        except FileNotFoundError:
+            # No lock file present
+            return False
+
+        if lock_content == self.my_uuid:
+            # Successfully acquired the lock
+            return True
+
+        # Otherwise not locked
+        return False
 
     def release(self):
         """
@@ -68,3 +95,6 @@ class UUIDFileLock:
         """
         self.release()
 
+class LockTimeoutException(Exception):
+    def __init__(self, message="acquiring lock timed out"):
+        super().__init__(message)
