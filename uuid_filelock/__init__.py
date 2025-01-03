@@ -31,7 +31,8 @@ class UUIDFileLock:
                 try:
                     with open(self.lock_file, 'r') as f:
                         lock_content = f.read().strip()
-                except:
+                except FileNotFoundError:
+                    # Deleted by lock holder
                     lock_content = None
 
                 if lock_content == self.my_uuid:
