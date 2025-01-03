@@ -4,15 +4,17 @@ import uuid
 from typing import Optional
 
 class UUIDFileLock:
-    def __init__(self, lock_file: str, retry_interval: float = 1.0):
+    def __init__(self, lock_file: str, verification_delay: float = 1.0, retry_interval: float = 0.1):
         """
         Initialize the UUIDFileLock.
 
         Args:
             lock_file (str): Path to the lock file.
+            verification_delay (float): Time to wait before verifying lock (in seconds).
             retry_interval (float): Time to wait before retrying (in seconds).
         """
         self.lock_file = str(lock_file)
+        self.verification_delay = verification_delay
         self.retry_interval = retry_interval
         self.my_uuid = str(uuid.uuid4())
 
@@ -27,7 +29,7 @@ class UUIDFileLock:
                     f.write(self.my_uuid)
 
                 # Wait a moment and verify the lock
-                time.sleep(self.retry_interval)
+                time.sleep(self.verification_delay)
                 try:
                     with open(self.lock_file, 'r') as f:
                         lock_content = f.read().strip()

@@ -27,6 +27,7 @@ You can use the `UUIDFileLock` class to acquire and release locks in your Python
 ### Example: Using the Lock Explicitly
 
 ```python
+import time
 from uuid_filelock import UUIDFileLock
 
 lock_file_path = "/tmp/mylockfile.lock"
@@ -49,6 +50,7 @@ finally:
 ### Example: Using the Lock in a `with` Clause
 
 ```python
+import time
 from uuid_filelock import UUIDFileLock
 
 lock_file_path = "/tmp/mylockfile.lock"
@@ -66,7 +68,8 @@ print("Lock released.")
 ## Parameters
 
 - `lock_file` (str): The path to the lock file.
-- `retry_interval` (float, default=1.0): Time to wait before retrying if the lock cannot be acquired.
+- `verification_delay` (float, default=1.0): Time to wait before verifying that the lock was acquired.
+- `retry_interval` (float, default=0.1): Time to wait before retrying if the lock cannot be acquired.
 
 ## License
 
