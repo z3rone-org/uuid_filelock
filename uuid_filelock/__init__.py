@@ -4,7 +4,7 @@ import uuid
 from typing import Optional
 
 class UUIDFileLock:
-    def __init__(self, lock_file: str, verification_delay: float = 1.0, retry_interval: float = 0.1):
+    def __init__(self, lock_file: str, verification_delay: float = 1.0, retry_interval: float = 0.5):
         """
         Initialize the UUIDFileLock.
 
