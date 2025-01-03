@@ -70,6 +70,7 @@ print("Lock released.")
 - `lock_file` (str): The path to the lock file.
 - `verification_delay` (float, default=1.0): Time to wait before verifying that the lock was acquired.
 - `retry_interval` (float, default=0.1): Time to wait before retrying if the lock cannot be acquired.
+- `timeout_interval` (float, default=-1.0): Timeout for acquiring lock. Set to negative value for no timeout.
 
 ## License
 
