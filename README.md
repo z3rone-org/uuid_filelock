@@ -36,18 +36,17 @@ from uuid_filelock import UUIDFileLock
 lock_file_path = "/tmp/mylockfile.lock"
 lock = UUIDFileLock(lock_file_path)
 
-try:
-    print("Trying to acquire lock...")
-    lock.acquire()
-    print("Lock acquired!")
+print("Acquire lock...")
+lock.acquire()
+print("Lock acquired!")
 
-    # Perform critical section tasks here
-    # Simulating work
-    time.sleep(5)
+# Perform critical section tasks here
+# Simulating work
+time.sleep(5)
 
-finally:
-    lock.release()
-    print("Lock released.")
+# Release the lock
+lock.release()
+print("Lock released.")
 ```
 
 ### Example: Using the Lock in a `with` Clause
