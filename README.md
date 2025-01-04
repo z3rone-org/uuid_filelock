@@ -68,6 +68,7 @@ print("Lock released.")
 ## Parameters
 
 - `lock_file` (str): The path to the lock file.
+- `prefix` (str, default=""): A custom prefix for the UUID to help debugging. 
 - `verification_delay` (float, default=1.0): Time to wait before verifying that the lock was acquired.
 - `retry_interval` (float, default=0.1): Time to wait before retrying if the lock cannot be acquired.
 - `timeout_interval` (float, default=-1): Timeout for acquiring lock. Set to negative value for no timeout.

@@ -6,14 +6,17 @@ from uuid_filelock import UUIDFileLock, LockTimeoutException
 
 def test_two_locks(tmpdir):
     lockfile = os.path.join(tmpdir, '.lock')
-    lock1 = UUIDFileLock(lockfile)
-    lock2 = UUIDFileLock(lockfile)
+    lock1 = UUIDFileLock(lockfile, prefix='lock1-')
+    lock2 = UUIDFileLock(lockfile, prefix='lock2-')
 
     assert not lock1.check_lock()
     assert not lock2.check_lock()
 
     # Acquire the lock
     lock1.acquire()
+
+    with open(lock1.lock_file) as f:
+        assert f.readline().startswith('lock1-')
 
     assert lock1.check_lock()
     assert not lock2.check_lock()
@@ -60,7 +63,7 @@ def test_context_manager(tmpdir):
         with open(str(lockfile), 'r') as f:
             lock_content = f.read().strip()
 
-        assert lock_content == lock.my_uuid
+        assert lock_content == lock.lock_id
 
     # Ensure that the lock file is removed after exiting the context
     assert not os.path.exists(str(lockfile))

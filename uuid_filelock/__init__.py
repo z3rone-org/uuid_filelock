@@ -7,6 +7,7 @@ from datetime import datetime
 class UUIDFileLock:
     def __init__(self,
                  lock_file: str,
+                 prefix='',
                  verification_delay: float = 1.0,
                  retry_interval: float = 0.5,
                  timeout_interval: float = -1):
@@ -21,7 +22,7 @@ class UUIDFileLock:
         self.lock_file = str(lock_file)
         self.verification_delay = verification_delay
         self.retry_interval = retry_interval
-        self.my_uuid = str(uuid.uuid4())
+        self.lock_id = f'{prefix}{uuid.uuid4()}'
         self.timeout_interval = timeout_interval
 
     def acquire(self):
@@ -34,7 +35,7 @@ class UUIDFileLock:
             if not os.path.exists(self.lock_file):
                 # Attempt to create the lock file with the UUID
                 with open(self.lock_file, 'w') as f:
-                    f.write(self.my_uuid)
+                    f.write(self.lock_id)
 
                 # Wait a moment and verify the lock
                 time.sleep(self.verification_delay)
@@ -45,7 +46,7 @@ class UUIDFileLock:
                     # Deleted by lock holder
                     lock_content = None
 
-                if lock_content == self.my_uuid:
+                if lock_content == self.lock_id:
                     # Successfully acquired the lock
                     return
 
@@ -64,7 +65,7 @@ class UUIDFileLock:
             # No lock file present
             return False
 
-        if lock_content == self.my_uuid:
+        if lock_content == self.lock_id:
             # Successfully acquired the lock
             return True
 
@@ -79,7 +80,7 @@ class UUIDFileLock:
             with open(self.lock_file, 'r') as f:
                 lock_content = f.read().strip()
 
-            if lock_content == self.my_uuid:
+            if lock_content == self.lock_id:
                 os.remove(self.lock_file)
 
     def __enter__(self):
