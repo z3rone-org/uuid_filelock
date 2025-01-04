@@ -17,6 +17,7 @@ This mechanism ensures that only one process can hold the lock at any time, maki
 
 *Note: In order for this to work over a network share the `verification_delay` needs to be larger than the time it takes for a client to detect that another has created a file.*
 
+![working principal](docs/uuid_filelock.png)
 ## Installation
 
 Install the package via pip:
