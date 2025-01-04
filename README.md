@@ -15,6 +15,8 @@ This does not require any file locking capabilities of the underlying filesystem
 
 This mechanism ensures that only one process can hold the lock at any time, making it ideal for coordinating file or resource access across multiple processes.
 
+*Note: In order for this to work over a network share the `verification_delay` needs to be larger than the time it takes for a client to detect that another has created a file.*
+
 ## Installation
 
 Install the package via pip:
