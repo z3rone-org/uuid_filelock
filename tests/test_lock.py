@@ -1,5 +1,4 @@
-import pytest
-import uuid
+from datetime import datetime
 import os
 from uuid_filelock import UUIDFileLock, LockTimeoutException
 
@@ -51,6 +50,24 @@ def test_timeout(tmpdir):
     assert not lock1.check_lock()
     assert not lock2.check_lock()
 
+
+def test_default_params(tmpdir):
+    lockfile = os.path.join(tmpdir, '.lock')
+    UUIDFileLock.default_verification_delay = 5
+    start_time = datetime.now()
+    with UUIDFileLock(str(lockfile)):
+        end_time = datetime.now()
+    time_diff = (end_time - start_time).total_seconds()
+    assert time_diff > 5
+    assert time_diff < 6
+
+    UUIDFileLock.default_verification_delay = 2
+    start_time = datetime.now()
+    with UUIDFileLock(str(lockfile)):
+        end_time = datetime.now()
+    time_diff = (end_time - start_time).total_seconds()
+    assert time_diff > 2
+    assert time_diff < 3
 
 
 def test_context_manager(tmpdir):
