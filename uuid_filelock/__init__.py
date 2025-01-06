@@ -5,11 +5,13 @@ from datetime import datetime
 
 
 class UUIDFileLock:
+    default_verification_delay: float = 0.1
+    default_retry_interval: float = 0.1
     def __init__(self,
                  lock_file: str,
                  prefix='',
-                 verification_delay: float = 1.0,
-                 retry_interval: float = 0.5,
+                 verification_delay: float = None,
+                 retry_interval: float = None,
                  timeout_interval: float = -1):
         """
         Initialize the UUIDFileLock.
@@ -20,10 +22,18 @@ class UUIDFileLock:
             retry_interval (float): Time to wait before retrying (in seconds).
         """
         self.lock_file = str(lock_file)
-        self.verification_delay = verification_delay
-        self.retry_interval = retry_interval
         self.lock_id = f'{prefix}{uuid.uuid4()}'
         self.timeout_interval = timeout_interval
+
+        if verification_delay is None:
+            self.verification_delay = UUIDFileLock.default_verification_delay
+        else:
+            self.verification_delay = verification_delay
+
+        if retry_interval is None:
+            self.retry_interval = UUIDFileLock.default_retry_interval
+        else:
+            self.retry_interval = retry_interval
 
     def acquire(self):
         """
