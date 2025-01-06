@@ -1,6 +1,7 @@
 # UUID File Lock
 
 [![PyPi badge](https://img.shields.io/pypi/v/uuid-filelock)](https://pypi.org/project/uuid-filelock/)
+![pytest badge](https://github.com/z3rone-org/uuid_filelock/actions/workflows/python-test.yml/badge.svg)
 
 A simple UUID-based file lock implementation for Python. This package provides a lightweight and effective way to coordinate access to shared resources using a lock file mechanism.
 This does not require any file locking capabilities of the underlying filesystem or network share.
