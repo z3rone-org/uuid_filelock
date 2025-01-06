@@ -78,6 +78,10 @@ print("Lock released.")
 - `retry_interval` (float, default=0.1): Time to wait before retrying if the lock cannot be acquired.
 - `timeout_interval` (float, default=-1): Timeout for acquiring lock. Set to negative value for no timeout.
 
+## Change Default Values
+You can change the default values for `verification_delay` and `retry_interval`
+via `UUIDFileLock.verification_delay=<new_value>` and `UUIDFileLock.retry_interval=<new_value>` respectively.
+
 ## License
 
 This package is licensed under the MIT License.
